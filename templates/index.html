@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Downloader</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Circular', Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #1db954;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h4 {
+            color: #1db954;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #181818;
+            border: 1px solid #282828;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        .form-control {
+            background-color: #282828;
+            border: 1px solid #535353;
+            color: #ffffff;
+            padding: 12px;
+        }
+        .form-control:focus {
+            background-color: #333;
+            color: #fff;
+            border-color: #1db954;
+            box-shadow: 0 0 0 0.25rem rgba(29, 185, 84, 0.25);
+        }
+        .btn-spotify {
+            background-color: #1db954;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-spotify:hover {
+            background-color: #1ed760;
+            color: #ffffff;
+        }
+        .btn-spotify-sm {
+            background-color: #1db954;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .btn-spotify-sm:hover {
+            background-color: #1ed760;
+            color: #ffffff;
+        }
+        label {
+            color: #b3b3b3;
+            margin-bottom: 8px;
+        }
+        .download-list {
+            background-color: #282828;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .download-item {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .download-item:last-child {
+            border-bottom: none;
+        }
+        .download-link {
+            color: #1db954;
+            text-decoration: none;
+        }
+        .download-link:hover {
+            color: #1ed760;
+            text-decoration: underline;
+        }
+        .file-name {
+            color: #ffffff;
+            font-weight: normal;
+            word-break: break-word;
+            max-width: 80%;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-processing {
+            background-color: #e2b93b;
+            color: #000;
+        }
+        .status-completed {
+            background-color: #1db954;
+            color: #fff;
+        }
+        .status-failed {
+            background-color: #e25555;
+            color: #fff;
+        }
+        .loader {
+            border: 5px solid #282828;
+            border-top: 5px solid #1db954;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .form-text {
+            color: #b3b3b3 !important;
+        }
+        .console-output {
+            background-color: #0a0a0a;
+            color: #1db954;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            display: none;
+        }
+        .progress-container {
+            margin-top: 15px;
+            display: none;
+        }
+        .progress {
+            height: 10px;
+            background-color: #282828;
+        }
+        .progress-bar {
+            background-color: #1db954;
+        }
+        .collection-header {
+            background-color: #333;
+            padding: 12px 15px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .collection-header:hover {
+            background-color: #444;
+        }
+        .collection-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            color: #ffffff;
+        }
+        .collection-timestamp {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-left: 10px;
+            font-style: italic;
+        }
+        .collection-type-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background-color: #1db954;
+            color: #fff;
+            margin-right: 10px;
+            text-transform: uppercase;
+        }
+        .collection-content {
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+        .collection-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .collection-container {
+            margin-bottom: 15px;
+        }
+        .collection-container:last-child {
+            margin-bottom: 0;
+        }
+        .collection-icon {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Spotify Downloader</h1>
+        
+        <div class="card">
+            <form id="download-form">
+                <div class="mb-3">
+                    <label for="spotify-url" class="form-label">Spotify URL (Song, Album, or Playlist)</label>
+                    <input type="text" class="form-control" id="spotify-url" 
+                           placeholder="https://open.spotify.com/track/..." required>
+                    <div class="form-text">Paste a Spotify link to a song, album, or playlist</div>
+                </div>
+                <button type="submit" class="btn btn-spotify">Download</button>
+            </form>
+            <div class="loader" id="loader"></div>
+            <div id="download-status" class="mt-3"></div>
+            
+            <!-- Progress bar -->
+            <div id="progress-container" class="progress-container">
+                <div class="progress">
+                    <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Console output -->
+            <div id="console-output" class="console-output"></div>
+        </div>
+        
+        <!-- Collections (Albums/Playlists) -->
+        {% if collections %}
+        <div class="card" id="collections-card">
+            <h4>Your Collections</h4>
+            <div class="download-list">
+                {% for collection in collections %}
+                <div class="collection-container">
+                    <div class="collection-header" data-collection-id="collection_{{ collection.type }}_{{ collection.name|replace(' ', '_') }}">
+                        <div class="collection-title">
+                            <span class="collection-type-badge">{{ collection.type }}</span>
+                            <i class="bi bi-music-note-list collection-icon"></i>
+                            {{ collection.name }}
+                            <span class="collection-timestamp">{{ collection.timestamp.split('T')[0] }} {{ collection.timestamp.split('T')[1].split('.')[0] }}</span>
+                        </div>
+                        <div class="collection-actions">
+                            <a href="/download-all/{{ collection.task_id }}" class="btn btn-spotify-sm">
+                                <i class="bi bi-download"></i> Download All
+                            </a>
+                            <button class="btn btn-outline-light btn-sm" id="toggle-btn-collection_{{ collection.type }}_{{ collection.name|replace(' ', '_') }}">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="collection-content" id="collection-collection_{{ collection.type }}_{{ collection.name|replace(' ', '_') }}" style="display: none;">
+                        {% for file in collection.files %}
+                        <div class="download-item">
+                            <span class="file-name">{{ file.name }}</span>
+                            {% if file.direct_download %}
+                            <a href="/download/direct/{{ file.name }}" class="download-link">Download</a>
+                            {% else %}
+                            <a href="/download/{{ file.task_id }}/{{ file.name }}" class="download-link">Download</a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Individual Files -->
+        {% if standalone_files %}
+        <div class="card" id="available-downloads-card">
+            <h4>Individual Tracks</h4>
+            <div class="download-list">
+                {% for file in standalone_files %}
+                <div class="download-item">
+                    <span class="file-name">{{ file.name }}</span>
+                    {% if file.direct_download %}
+                    <a href="/download/direct/{{ file.name }}" class="download-link">Download</a>
+                    {% else %}
+                    <a href="/download/{{ file.task_id }}/{{ file.name }}" class="download-link">Download</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Active Downloads Card (for newly added downloads) -->
+        <div class="card" id="downloads-card" style="display: none;">
+            <h4>Your Downloads</h4>
+            <div class="download-list" id="download-list">
+                <!-- Downloads will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadForm = document.getElementById('download-form');
+            const spotifyUrlInput = document.getElementById('spotify-url');
+            const downloadStatus = document.getElementById('download-status');
+            const downloadList = document.getElementById('download-list');
+            const downloadsCard = document.getElementById('downloads-card');
+            const loader = document.getElementById('loader');
+            const consoleOutput = document.getElementById('console-output');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // Store active downloads
+            const activeDownloads = {};
+            let currentEventSource = null;
+            
+            downloadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const spotifyUrl = spotifyUrlInput.value.trim();
+                if (!spotifyUrl) {
+                    showStatus('Please enter a valid Spotify URL', 'danger');
+                    return;
+                }
+                
+                // Show loader and console output
+                loader.style.display = 'block';
+                consoleOutput.style.display = 'block';
+                consoleOutput.innerHTML = 'Starting download...\n';
+                progressContainer.style.display = 'block';
+                progressBar.style.width = '0%';
+                downloadStatus.innerHTML = '';
+                
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('spotify_url', spotifyUrl);
+                
+                // Send download request
+                fetch('/download', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'processing') {
+                        // Start streaming the output
+                        startEventStream(data.task_id, spotifyUrl);
+                    } else {
+                        loader.style.display = 'none';
+                        showStatus(`Error: ${data.message}`, 'danger');
+                    }
+                })
+                .catch(error => {
+                    loader.style.display = 'none';
+                    progressContainer.style.display = 'none';
+                    showStatus('An error occurred during the download process', 'danger');
+                    console.error('Download error:', error);
+                });
+            });
+            
+            function startEventStream(taskId, spotifyUrl) {
+                // Close any existing event source
+                if (currentEventSource) {
+                    currentEventSource.close();
+                }
+                
+                // Create a new event source
+                const eventSource = new EventSource(`/stream/${taskId}`);
+                currentEventSource = eventSource;
+                
+                // Handle incoming messages
+                eventSource.onmessage = function(event) {
+                    const data = event.data;
+                    
+                    if (data.startsWith('COMPLETED:')) {
+                        // Download completed
+                        const parts = data.substring('COMPLETED:'.length).split(',');
+                        const files = parts.filter((_, index) => index < parts.length - 2 || parts.length <= 2);
+                        
+                        // Check if we have collection info
+                        let collectionType = null;
+                        let collectionName = null;
+                        
+                        if (parts.length > 2) {
+                            collectionType = parts[parts.length - 2];
+                            collectionName = parts[parts.length - 1];
+                        }
+                        
+                        // Update UI
+                        loader.style.display = 'none';
+                        progressBar.style.width = '100%';
+                        showStatus(`Success! Downloaded ${files.length} file(s)`, 'success');
+                        
+                        // Store task info
+                        activeDownloads[taskId] = {
+                            url: spotifyUrl,
+                            status: 'completed',
+                            files: files,
+                            collectionType: collectionType,
+                            collectionName: collectionName
+                        };
+                        
+                        // Update downloads list
+                        updateDownloadsList();
+                        
+                        // Clear input
+                        spotifyUrlInput.value = '';
+                        
+                        // Close the event source
+                        eventSource.close();
+                        currentEventSource = null;
+                        
+                        // Reload page to show new downloads
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                        
+                    } else if (data.startsWith('FAILED:')) {
+                        // Download failed
+                        const error = data.substring('FAILED:'.length);
+                        
+                        // Update UI
+                        loader.style.display = 'none';
+                        progressContainer.style.display = 'none';
+                        showStatus(`Error: ${error}`, 'danger');
+                        
+                        // Close the event source
+                        eventSource.close();
+                        currentEventSource = null;
+                        
+                    } else if (data === 'WAITING') {
+                        // Just waiting for more output, do nothing
+                    } else {
+                        // Regular output line
+                        consoleOutput.innerHTML += data + '\n';
+                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                        
+                        // Try to update progress based on output
+                        updateProgressFromOutput(data);
+                    }
+                };
+                
+                eventSource.onerror = function() {
+                    console.error('EventSource failed');
+                    eventSource.close();
+                    currentEventSource = null;
+                    
+                    // Update UI in case of error
+                    loader.style.display = 'none';
+                    progressContainer.style.display = 'none';
+                    showStatus('Connection to server lost', 'danger');
+                };
+            }
+            
+            function updateProgressFromOutput(line) {
+                // Try to extract progress information from the output line
+                // This is specific to spotdl output format
+                
+                // Check for percentage indicators
+                const percentMatch = line.match(/(\d+)%/);
+                if (percentMatch) {
+                    const percent = parseInt(percentMatch[1]);
+                    if (!isNaN(percent) && percent >= 0 && percent <= 100) {
+                        progressBar.style.width = `${percent}%`;
+                        return;
+                    }
+                }
+                
+                // Check for "Converting" status which indicates progress
+                if (line.includes('Converting')) {
+                    // If we can't get exact percentage, show indeterminate progress
+                    progressBar.style.width = '50%';
+                }
+            }
+            
+            function showStatus(message, type) {
+                const alertClass = type === 'success' ? 'alert-success' : 
+                                 type === 'danger' ? 'alert-danger' : 'alert-warning';
+                
+                downloadStatus.innerHTML = `
+                    <div class="alert ${alertClass}" role="alert">
+                        ${message}
+                    </div>
+                `;
+            }
+            
+            function updateDownloadsList() {
+                // Show downloads card if we have downloads
+                if (Object.keys(activeDownloads).length > 0) {
+                    downloadsCard.style.display = 'block';
+                    
+                    // Clear current list
+                    downloadList.innerHTML = '';
+                    
+                    // Add each download
+                    for (const [taskId, task] of Object.entries(activeDownloads)) {
+                        const statusClass = task.status === 'completed' ? 'status-completed' : 
+                                          task.status === 'processing' ? 'status-processing' : 'status-failed';
+                        
+                        const downloadItem = document.createElement('div');
+                        downloadItem.className = 'download-item';
+                        
+                        if (task.status === 'completed' && task.files && task.files.length > 0) {
+                            // Create file list for completed downloads
+                            let filesHtml = '<div class="w-100">';
+                            
+                            // If we have collection info, show it
+                            if (task.collectionType && task.collectionName) {
+                                filesHtml += `
+                                    <div class="mb-2">
+                                        <span class="collection-type-badge">${task.collectionType}</span>
+                                        <strong>${task.collectionName}</strong>
+                                        <a href="/download-all/${taskId}" class="btn btn-spotify-sm ms-2">
+                                            <i class="bi bi-download"></i> Download All
+                                        </a>
+                                    </div>
+                                `;
+                            }
+                            
+                            // Add each file with download link
+                            task.files.forEach(file => {
+                                filesHtml += `
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="file-name">${file}</span>
+                                        <a href="/download/${taskId}/${file}" class="download-link">Download</a>
+                                    </div>
+                                `;
+                            });
+                            
+                            // Add cleanup button
+                            filesHtml += `
+                                <button class="btn btn-sm btn-outline-danger mt-2" 
+                                        onclick="cleanupDownload('${taskId}')">
+                                    Remove
+                                </button>
+                            `;
+                            
+                            filesHtml += '</div>';
+                            downloadItem.innerHTML = filesHtml;
+                        } else {
+                            // Simple status display for non-completed downloads
+                            downloadItem.innerHTML = `
+                                <div>${task.url}</div>
+                                <span class="status-badge ${statusClass}">${task.status}</span>
+                            `;
+                        }
+                        
+                        downloadList.appendChild(downloadItem);
+                    }
+                } else {
+                    downloadsCard.style.display = 'none';
+                }
+            }
+            
+            // Add to global scope for the cleanup button
+            window.cleanupDownload = function(taskId) {
+                fetch(`/cleanup/${taskId}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove from active downloads
+                        delete activeDownloads[taskId];
+                        updateDownloadsList();
+                        
+                        // Reload page to update available downloads
+                        window.location.reload();
+                    } else {
+                        showStatus(`Error: ${data.message}`, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Cleanup error:', error);
+                    showStatus('An error occurred during cleanup', 'danger');
+                });
+            };
+            
+            // Add event listeners to collection headers
+            document.querySelectorAll('.collection-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const collectionId = this.getAttribute('data-collection-id');
+                    toggleCollection(collectionId);
+                });
+            });
+        });
+        
+        // Function to toggle collection visibility
+        function toggleCollection(collectionId) {
+            const content = document.getElementById(`collection-${collectionId}`);
+            const toggleBtn = document.getElementById(`toggle-btn-${collectionId}`);
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="bi bi-chevron-up"></i>';
+            } else {
+                content.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="bi bi-chevron-down"></i>';
+            }
+        }
+    </script>
+</body>
+</html>
